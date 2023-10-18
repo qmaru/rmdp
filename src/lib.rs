@@ -29,8 +29,6 @@ impl MdprMedia {
     }
 
     pub fn get_image_index(&self) -> Result<String, Box<dyn Error>> {
-        let mut image_index = String::from("");
-
         const MDPR_HOST: &str = "https://app2-mdpr.freetls.fastly.net";
         const USER_AGENT:&str = "Mozilla/5.0 (Linux; Android 7.1.1; E6533 Build/32.4.A.1.54; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.85 Mobile Safari/537.36";
         const X_REQUESTED_WITH: &str = "jp.mdpr.mdprviewer";
@@ -57,7 +55,8 @@ impl MdprMedia {
                 let mdpr_image_index = mdpr_json_data["url"].as_str();
                 if let Some(mdpr_image_index) = mdpr_image_index {
                     if mdpr_image_index.contains(aid) {
-                        image_index = format!("{MDPR_HOST}{mdpr_image_index}");
+                        let image_index = format!("{MDPR_HOST}{mdpr_image_index}");
+                        return Ok(image_index);
                     }
                 } else {
                     return Err("image not found".into());
@@ -66,7 +65,7 @@ impl MdprMedia {
                 return Err("data not found".into());
             }
         }
-        Ok(image_index)
+        Ok(String::from(""))
     }
 
     pub fn get_image_urls(&self, image_index: String) -> Result<Vec<String>, Box<dyn Error>> {
