@@ -100,7 +100,7 @@ impl MdprMedia {
     }
 }
 
-/** `mdpr_images` 获取 mdpr 图片地址
+/** `mdpr_images` Get mdpr media
 ```
 use rmdp::MdprMedia;
 let url = String::from("https://mdpr.jp/cinema/3928728");
