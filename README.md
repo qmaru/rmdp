@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://github.com/qmaru/rmdp">
+  <img alt="rmdp status" src="https://github.com/qmaru/rmdp/workflows/build-test/badge.svg">
+  </a>
+</p>
+
 # rmdp
 
 ## bin
