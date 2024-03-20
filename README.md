@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/qmaru/rmdp">
-  <img alt="rmdp status" src="https://github.com/qmaru/rmdp/workflows/build-test/badge.svg">
+  <img alt="wasm-pack-action status" src="https://github.com/qmaru/rmdp/workflows/test/badge.svg">
   </a>
 </p>
 
