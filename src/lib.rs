@@ -40,10 +40,11 @@ impl MdprMedia {
 
         let mobile_index = format!("{MDPR_HOST}/articles/detail/{aid}");
         let body = ureq::get(&mobile_index)
-            .set("User-Agent", USER_AGENT)
-            .set("X-Requested-With", X_REQUESTED_WITH)
+            .header("User-Agent", USER_AGENT)
+            .header("X-Requested-With", X_REQUESTED_WITH)
             .call()?
-            .into_string()?;
+            .body_mut()
+            .read_to_string()?;
 
         let document = Document::from_read(body.as_bytes())?;
         let nodes = document.find(Class("p-articleBody").descendant(Name("a")));
@@ -75,10 +76,11 @@ impl MdprMedia {
         const MDPR_USER_AGENT: &str = "sony; E653325; android; 7.1.1; 3.10.4838(66);";
 
         let body = ureq::get(&image_index)
-            .set("User-Agent", USER_AGENT)
-            .set("mdpr-user-agent", MDPR_USER_AGENT)
+            .header("User-Agent", USER_AGENT)
+            .header("mdpr-user-agent", MDPR_USER_AGENT)
             .call()?
-            .into_string()?;
+            .body_mut()
+            .read_to_string()?;
 
         let mdpr_image_data: Value = serde_json::from_str(&body)?;
         let mdpr_image_list = mdpr_image_data["list"].as_array();
