@@ -1,6 +1,6 @@
 use std::env;
 
-use rmdp::MdprMedia;
+use rmdp::mdpr_images;
 
 fn main() {
     let user_url = env::args().nth(1);
@@ -15,22 +15,15 @@ fn main() {
 
     if let Some(url) = user_url {
         let url = String::from(url);
-        let mdpr = MdprMedia::new(url);
-        let image_index = mdpr.get_image_index();
-        match image_index {
-            Ok(index) => {
-                let image_urls = mdpr.get_image_urls(index);
-                match image_urls {
-                    Ok(urls) => {
-                        if format == "text" {
-                            for url in urls {
-                                println!("{}", url)
-                            }
-                        } else {
-                            println!("{:?}", urls)
-                        }
+        let image_urls = mdpr_images(url);
+        match image_urls {
+            Ok(urls) => {
+                if format == "text" {
+                    for url in urls {
+                        println!("{}", url)
                     }
-                    Err(error) => println!("error: {}", error),
+                } else {
+                    println!("{:?}", urls)
                 }
             }
             Err(error) => println!("error: {}", error),

@@ -1,10 +1,6 @@
-<p align="center">
-  <a href="https://github.com/qmaru/rmdp">
-  <img alt="wasm-pack-action status" src="https://github.com/qmaru/rmdp/workflows/test/badge.svg">
-  </a>
-</p>
-
 # rmdp
+
+[![wasm-pack-action status](https://github.com/qmaru/rmdp/workflows/test/badge.svg)](https://github.com/qmaru/rmdp)
 
 ## bin
 
