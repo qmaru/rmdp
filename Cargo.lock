@@ -581,7 +581,7 @@ dependencies = [
 
 [[package]]
 name = "rmdp"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "select",
  "serde_json",

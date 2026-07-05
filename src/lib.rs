@@ -31,7 +31,7 @@ impl MobileMdprMedia {
 
     pub fn get_image_index(&self) -> Result<String, Box<dyn Error>> {
         const MDPR_HOST: &str = "https://app2-mdpr.freetls.fastly.net";
-        const USER_AGENT: &str = "Mozilla/5.0 (Linux; Android 7.1.1; E6533 Build/32.4.A.1.54; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.85 Mobile Safari/537.36";
+        const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36";
         const X_REQUESTED_WITH: &str = "jp.mdpr.mdprviewer";
 
         let aid = self.get_article_id();
@@ -114,7 +114,7 @@ impl WebMdprMedia {
 
     fn get_image_index(&self) -> Result<String, Box<dyn Error>> {
         const HOST: &str = "https://mdpr.jp";
-        const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36";
+        const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36";
 
         let url = self.url.trim();
         if !url.contains(HOST) {
@@ -185,21 +185,21 @@ impl WebMdprMedia {
 }
 
 pub fn mdpr_images(url: String) -> Result<Vec<String>, Box<dyn Error>> {
-    let mobile = MobileMdprMedia::new(url.clone());
+    // let mobile = MobileMdprMedia::new(url.clone());
 
-    let mobile_urls = match mobile.get_image_index() {
-        Ok(idx) if !idx.is_empty() => match mobile.get_image_urls(idx) {
-            Ok(urls) if !urls.is_empty() => Some(urls),
-            Ok(_) => None,
-            Err(_) => None,
-        },
-        Ok(_) => None,
-        Err(_) => None,
-    };
+    // let mobile_urls = match mobile.get_image_index() {
+    //     Ok(idx) if !idx.is_empty() => match mobile.get_image_urls(idx) {
+    //         Ok(urls) if !urls.is_empty() => Some(urls),
+    //         Ok(_) => None,
+    //         Err(_) => None,
+    //     },
+    //     Ok(_) => None,
+    //     Err(_) => None,
+    // };
 
-    if let Some(urls) = mobile_urls {
-        return Ok(urls);
-    }
+    // if let Some(urls) = mobile_urls {
+    //     return Ok(urls);
+    // }
 
     let web = WebMdprMedia::new(url);
 
