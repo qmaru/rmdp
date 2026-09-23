@@ -1,16 +1,27 @@
 use std::error::Error;
 
+use reqwest::Client;
 use select::document::Document;
 use select::node::Node;
 use select::predicate::{Class, Name, Predicate};
+#[cfg(not(target_arch = "wasm32"))]
 use std::time::Duration;
-use reqwest::Client;
 
 fn agent() -> Client {
-    Client::builder()
-        .timeout(Duration::from_secs(15))
-        .build()
-        .expect("failed to build HTTP client")
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        return Client::builder()
+            .timeout(Duration::from_secs(15))
+            .build()
+            .expect("failed to build HTTP client");
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        Client::builder()
+            .build()
+            .expect("failed to build HTTP client")
+    }
 }
 
 pub struct WebMdprMedia {
@@ -22,7 +33,10 @@ impl WebMdprMedia {
         WebMdprMedia { url }
     }
 
-    async fn get_image_index(&self, agent: &Client) -> Result<String, Box<dyn Error + Send + Sync>> {
+    async fn get_image_index(
+        &self,
+        agent: &Client,
+    ) -> Result<String, Box<dyn Error + Send + Sync>> {
         const HOST: &str = "https://mdpr.jp";
         const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36";
 
