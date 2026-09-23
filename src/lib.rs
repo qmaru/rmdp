@@ -4,14 +4,13 @@ use select::document::Document;
 use select::node::Node;
 use select::predicate::{Class, Name, Predicate};
 use std::time::Duration;
-use ureq;
-use ureq::Agent;
+use reqwest::Client;
 
-fn agent() -> Agent {
-    ureq::Agent::config_builder()
-        .timeout_global(Some(Duration::from_secs(15)))
+fn agent() -> Client {
+    Client::builder()
+        .timeout(Duration::from_secs(15))
         .build()
-        .into()
+        .expect("failed to build HTTP client")
 }
 
 pub struct WebMdprMedia {
@@ -23,9 +22,9 @@ impl WebMdprMedia {
         WebMdprMedia { url }
     }
 
-    fn get_image_index(&self, agent: &Agent) -> Result<String, Box<dyn Error>> {
+    async fn get_image_index(&self, agent: &Client) -> Result<String, Box<dyn Error + Send + Sync>> {
         const HOST: &str = "https://mdpr.jp";
-        const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36";
+        const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36";
 
         let url = self.url.trim();
         if !url.contains(HOST) {
@@ -39,9 +38,11 @@ impl WebMdprMedia {
         let body = agent
             .get(url)
             .header("User-Agent", USER_AGENT)
-            .call()?
-            .body_mut()
-            .read_to_string()?;
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
 
         let document = Document::from_read(body.as_bytes())?;
         let nodes = document.find(Class("c-image__image"));
@@ -63,11 +64,11 @@ impl WebMdprMedia {
         Ok(String::from(""))
     }
 
-    fn get_image_urls(
+    async fn get_image_urls(
         &self,
-        agent: &Agent,
+        agent: &Client,
         image_index: &str,
-    ) -> Result<Vec<String>, Box<dyn Error>> {
+    ) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
         let mut urls: Vec<String> = vec![];
 
         const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36";
@@ -75,9 +76,11 @@ impl WebMdprMedia {
         let body = agent
             .get(image_index)
             .header("User-Agent", USER_AGENT)
-            .call()?
-            .body_mut()
-            .read_to_string()?;
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
 
         let document = Document::from_read(body.as_bytes())?;
         let nodes = document.find(
@@ -101,31 +104,32 @@ impl WebMdprMedia {
     }
 }
 
-pub fn mdpr_images(url: String) -> Result<Vec<String>, Box<dyn Error>> {
+pub async fn mdpr_images(url: String) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
     let agent = agent();
 
     let web = WebMdprMedia::new(url);
 
-    let image_index = web.get_image_index(&agent)?;
+    let image_index = web.get_image_index(&agent).await?;
     if image_index.is_empty() {
         return Ok(vec![]);
     }
 
-    web.get_image_urls(&agent, &image_index)
+    web.get_image_urls(&agent, &image_index).await
 }
 
-#[test]
-fn mdpr_test() {
+#[cfg(test)]
+#[tokio::test]
+async fn mdpr_test() {
     let url = "https://mdpr.jp/cinema/3928728";
     let web = WebMdprMedia::new(url.to_string());
 
     let agent = agent();
-    let index = web.get_image_index(&agent).unwrap();
+    let index = web.get_image_index(&agent).await.unwrap();
     println!("image index: {}", index);
 
     assert!(index.contains("14567030"), "image_index invalid: {}", index);
 
-    let image_urls = web.get_image_urls(&agent, &index);
+    let image_urls = web.get_image_urls(&agent, &index).await;
     let urls = match image_urls {
         Ok(urls) => {
             println!("image urls len: {}", urls.len());

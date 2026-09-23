@@ -6,7 +6,7 @@
 
 ```shell
 # Usage: rmdp <url> [text|json]
-cargo build
+cargo build --features cli
 rmdp https://mdpr.jp/cinema/3928728
 ```
 

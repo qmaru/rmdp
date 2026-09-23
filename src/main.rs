@@ -2,7 +2,8 @@ use std::env;
 
 use rmdp::mdpr_images;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let user_url = env::args().nth(1);
     let user_format = env::args().nth(2);
 
@@ -15,7 +16,7 @@ fn main() {
 
     if let Some(url) = user_url {
         let url = String::from(url);
-        let image_urls = mdpr_images(url);
+        let image_urls = mdpr_images(url).await;
         match image_urls {
             Ok(urls) => {
                 if format == "text" {
